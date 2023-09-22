@@ -1,0 +1,26 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Dark mode */
+html.dark body {
+  background-color: #313338;
+}
+
+/* This is for Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: hsl(var(--background) / 0.3);
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--background) / 0.1);
+  border-radius: 20px;
+  border: 3px solid #313338;
+}
