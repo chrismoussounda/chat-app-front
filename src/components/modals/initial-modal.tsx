@@ -20,14 +20,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FileUpload } from '../file-upload';
-import { useEffect } from 'react';
-import { deleteFile, uploadFile } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createServer } from '@/services/server';
 import { useToast } from '../ui/use-toast';
-import { useServers } from '@/features/server/use-servers';
+import { refreshServers, useServers } from '@/features/server/use-servers';
 import Loader from '../loader';
+import { uploadFile } from '@/services/file-upload';
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -39,9 +39,14 @@ const formSchema = z.object({
 });
 
 export const Initial = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const { servers, isLoading: serversLoading } = useServers();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!serversLoading && servers.length === 0) setIsOpen(true);
+  }, [servers.length, serversLoading]);
 
   useEffect(() => {
     if (!serversLoading && servers.length) {
@@ -60,24 +65,22 @@ export const Initial = () => {
 
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async ({ file, name }: z.infer<typeof formSchema>) => {
-    let url = '';
     try {
-      const { imageUrl, location } = await uploadFile(file);
-      url = location;
+      const imageUrl = await uploadFile(file);
       const server = await createServer({ name, imageUrl });
+      await refreshServers();
       toast({ description: 'Serveur crée' });
       navigate(`servers/${server.id}/channel/${server.channels[0].id}`);
     } catch (err) {
       const error = err as Error;
-      await deleteFile(url);
       toast({ description: error.message, variant: 'destructive' });
     }
   };
 
-  if (serversLoading) return <Loader />;
+  if (serversLoading || !isOpen) return <Loader />;
 
   return (
-    <Dialog open={true}>
+    <Dialog open={isOpen}>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">

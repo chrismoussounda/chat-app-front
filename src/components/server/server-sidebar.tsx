@@ -31,7 +31,9 @@ const ServerSidebar = () => {
   const textChannels = server?.channels.filter((channel) => channel.type === ChannelType.TEXT);
   const audioChannels = server?.channels.filter((channel) => channel.type === ChannelType.AUDIO);
   const videoChannels = server?.channels.filter((channel) => channel.type === ChannelType.VIDEO);
-  const members = server?.members;
+  const members = server?.members.sort((a, b) => {
+    return Number(new Date(a.createAt) < new Date(b.createAt));
+  });
   const member = members?.filter((member) => member.userId === user.id);
   const role = member?.find((member) => (member.userId = user.id))?.role;
 
@@ -144,4 +146,4 @@ const ServerSidebar = () => {
   );
 };
 
-export default ServerSidebar
+export default ServerSidebar;

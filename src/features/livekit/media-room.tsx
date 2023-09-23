@@ -18,23 +18,40 @@ interface MediaRoomProps {
 
 const MediaRoom = ({ audio, chatId, video }: MediaRoomProps) => {
   const [isAudioChannel, setIsAudioChannel] = useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
+  const [isAsking, setIsAsking] = useState(true);
   const user = getUser();
   const { token, isLoading } = useLiveKit(chatId, user.name);
   const { channelId = '' } = useParams();
   const channel = getChannel(channelId);
   useEffect(() => {
+    const isAudio = (channelId && channel.type === ChannelType.AUDIO) || false;
     if (channelId && channel) {
-      setIsAudioChannel(channel.type === ChannelType.AUDIO);
+      setIsAudioChannel(isAudio);
     }
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(
+          isAudio ? { audio: true } : { audio: true, video: true }
+        );
+        console.log(stream);
+        setHasPermission(true);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsAsking(false);
+      }
+    })();
   }, [channel, channelId]);
 
-  if (!token && isLoading) return <Loading name="room" />;
+  if (!token && isLoading && isAsking) return <Loading name="room" />;
   if (!isLoading && !token) return <Error />;
+  if (!hasPermission && !isAsking) return <Loading name="Waiting  for permission" />;
   return (
     <LiveKitRoom
       serverUrl={CONSTANT.LK_URL as string}
       data-lk-theme="default"
-      style={{ height: '100%' }}
+      style={{ height: '90vh' }}
       token={token}
       connect={true}
       video={video}

@@ -16,9 +16,17 @@ export const FileUploader = ({ onChange, type }: FileUploadProps) => {
     preventDropOnDocument: true,
   });
 
+  const fileAndroidSupport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const files = e.target.files;
+    if (!files) return;
+    onChange(files[0]);
+  };
+
   useEffect(() => {
     if (acceptedFiles.length) onChange(acceptedFiles[0]);
   }, [acceptedFiles, acceptedFiles.length, onChange]);
+  const isMobile = window.innerWidth < 768;
   return (
     <div
       {...getRootProps()}
@@ -40,16 +48,23 @@ export const FileUploader = ({ onChange, type }: FileUploadProps) => {
       <div className="m-0 h-[1.25rem] text-xs leading-5 text-gray-600">
         Allowed content : {type === 'message' ? 'image or pfd' : 'image'}
       </div>
-      <label className="relative mt-2 flex w-64 cursor-pointer items-center justify-center text-sm font-semibold leading-6 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-700 focus-within:ring-offset-2 hover:indigo-500/90 text-indigo-700">
+      <label
+        htmlFor="file"
+        className="relative mt-2 flex w-64 cursor-pointer items-center justify-center text-sm font-semibold leading-6 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-700 focus-within:ring-offset-2 hover:indigo-500/90 text-indigo-700"
+      >
         Choose a file or drag and drop
-        <input
-          {...getInputProps()}
-          multiple={false}
-          type="file"
-          tabIndex={-1}
-          className="hidden sr-only"
-          disabled
-        />
+        {isMobile ? (
+          <input id="file" type="file" hidden onChange={fileAndroidSupport} />
+        ) : (
+          <input
+            {...getInputProps()}
+            multiple={false}
+            type="file"
+            tabIndex={-1}
+            className="hidden sr-only"
+            disabled
+          />
+        )}
       </label>
     </div>
   );

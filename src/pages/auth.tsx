@@ -36,9 +36,9 @@ const Auth = () => {
 
   useEffect(() => {
     setIsSignin(location === '/sign-in');
+    console.log(user);
     if (user) navigate('/');
   }, [error, isLoading, location, navigate, user]);
-
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {

@@ -18,6 +18,7 @@ import QueryClientProvider from '@/components/provider/query-client-provider';
 // Import pages
 import ChannelPage from '@/pages/channel';
 import MemberPage from '@/pages/member';
+import JoinServer from '@/features/server/join';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Routes>
               <Route path="/" element={<ProtectedRoute />}>
                 <Route index element={<InitialModal />} />
+                <Route path="/invite/:inviteCode" element={<JoinServer />} />
                 <Route path="/servers/:serverId" element={<MainLayout />}>
                   <Route path="channels/:channelId" element={<ChannelPage />} />
                   <Route path="conversations/:memberId" element={<MemberPage />} />

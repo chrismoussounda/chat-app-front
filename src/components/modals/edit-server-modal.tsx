@@ -23,11 +23,11 @@ import { FileUpload } from '@/components/file-upload';
 import { useModal } from '@/hooks/use-modal-store';
 import { refreshServer } from '@/features/server/use-server';
 import { updateServer } from '@/services/server';
-import { uploadFile, deleteFile, getStorageRef } from '@/lib/utils';
 import { useToast } from '../ui/use-toast';
 import { Server } from '@/types';
 import { refreshServers } from '@/features/server/use-servers';
 import { useEffect } from 'react';
+import { deleteFile, uploadFile } from '@/services/file-upload';
 
 const formSchema = z.object({
   name: z
@@ -64,23 +64,19 @@ const EditServerModal = () => {
 
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async ({ file, name }: z.infer<typeof formSchema>) => {
-    let ref = '';
     let url = '';
     try {
       if (file && file.size > 0) {
-        await deleteFile(getStorageRef(server.imageUrl));
-        const { imageUrl, location } = await uploadFile(file);
-        ref = location;
-        url = imageUrl;
+        await deleteFile(server.imageUrl);
+        url = await uploadFile(file);
       }
       await updateServer({ name, imageUrl: url ? url : server.imageUrl, id: server.id });
       await refreshServer(server.id);
-      if (ref) await refreshServers();
+      if (url) await refreshServers();
       toast({ description: 'Serveur mis à jour' });
       handleClose();
     } catch (err) {
       const error = err as Error;
-      if (ref) await deleteFile(ref);
       toast({ description: error.message, variant: 'destructive' });
     }
   };

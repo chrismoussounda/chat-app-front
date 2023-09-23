@@ -20,13 +20,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FileUpload } from '../file-upload';
-import { deleteFile, uploadFile } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { useModal } from '@/hooks/use-modal-store';
 import { refreshServers } from '@/features/server/use-servers';
 import { createServer } from '@/services/server';
 import { useToast } from '../ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { uploadFile } from '@/services/file-upload';
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -54,19 +54,14 @@ const CreateServerModal = () => {
 
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async ({ file, name }: z.infer<typeof formSchema>) => {
-    let url = '';
-    let serverId = '';
     try {
-      const { imageUrl, location } = await uploadFile(file);
-      url = location;
-      const server = await createServer({ name, imageUrl });
-      serverId = server.id;
+      const imageUrl = await uploadFile(file);
+      const { id } = await createServer({ name, imageUrl });
       await refreshServers();
       handleClose();
-      navigate(`/servers/${server.id}`);
+      navigate(`/servers/${id}`);
     } catch (err) {
       const error = err as Error;
-      if (!serverId) await deleteFile(url);
       toast({ description: error.message, variant: 'destructive' });
     }
   };

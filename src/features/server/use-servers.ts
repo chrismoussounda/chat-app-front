@@ -13,6 +13,6 @@ export const getServers = () => {
   return queryClient.getQueryData([CONSTANT.SERVERS]) as Server[];
 };
 
-export const refreshServers = () => {
-  return queryClient.refetchQueries([CONSTANT.SERVERS]);
+export const refreshServers = async () => {
+  return await queryClient.refetchQueries([CONSTANT.SERVERS]);
 };

@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { deleteServer } from '@/services/server';
 import { getServers, refreshServers } from '@/features/server/use-servers';
 import { useNavigate } from 'react-router-dom';
+import { deleteFile } from '@/services/file-upload';
 
 const DeleteServerModal = () => {
   const { isOpen, onClose, type, data } = useModal();
@@ -23,10 +24,10 @@ const DeleteServerModal = () => {
 
   const onSubmit = async () => {
     try {
-      const serverRef = servers.find((el) => el.id !== server?.id);
-      console.log({ servers, server, serverRef });
-      if (!server?.id) return;
       setIsloading(true);
+      const serverRef = servers.find((el) => el.id !== server?.id);
+      if (!server?.id) return;
+      await deleteFile(server.imageUrl);
       await deleteServer(server.id);
       await refreshServers();
       onClose();

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem } from '../ui/form';
-import { Plus } from 'lucide-react';
+import { Plus, SendIcon } from 'lucide-react';
 import { Input } from '../ui/input';
 import { useModal } from '@/hooks/use-modal-store';
 import { EmojiPicker } from '../../features/messages/emogi-picker';
@@ -82,12 +82,18 @@ const ChatInput = ({ name, type, conversationId = '', memberId = '' }: ChatInput
                     placeholder={`Message ${type === 'conversation' ? 'to ' : '#'}${name} `}
                   />
                   <div
-                    className="absolute top-7 right-8  hover:cursor-pointer"
+                    className="hidden xs:block absolute top-7 right-8  hover:cursor-pointer"
                     aria-disabled={isLoading}
                   >
                     <EmojiPicker
                       onChange={(emoji: string) => field.onChange(`${field.value}${emoji}`)}
                     />
+                  </div>
+                  <div
+                    className="xs:hidden absolute top-7 right-8  hover:cursor-pointer"
+                    aria-disabled={isLoading}
+                  >
+                    <SendIcon />
                   </div>
                 </div>
               </FormControl>

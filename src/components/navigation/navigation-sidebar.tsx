@@ -4,6 +4,7 @@ import { Separator } from '@radix-ui/react-select';
 import { getServers } from '../../features/server/use-servers';
 import NavigationAction from './navigation-action';
 import NavigationItem from './navigation-item';
+import UserAction from '../user-action';
 
 const NavigationSidebar = () => {
   const servers = getServers();
@@ -19,6 +20,7 @@ const NavigationSidebar = () => {
         ))}
       </ScrollArea>
       <div className="pb-3 mt-auto flex items-center flex-col gap-y-4">
+        <UserAction />
         <ModeToggle />
       </div>
     </div>

@@ -40,8 +40,14 @@ export const updateServerMember = async (values: ServerApiProps) => {
   return res.data as Server;
 };
 
+export const joinServer = async (inviteCode: string) => {
+  const res = await axios.patch(`/server/${inviteCode}/join`);
+  if (res.status !== 200) throw new Error(res.data.message);
+  return res.data as Server;
+};
+
 export const removeServerMember = async (values: ServerApiProps) => {
-  const res = await axios.patch(`/server/${values.id}/remove-member`, values);
+  const res = await axios.delete(`/server/${values.id}/remove-member`, { params: values });
   if (res.status !== 200) throw new Error(res.data.message);
   return res.data as Server;
 };

@@ -37,6 +37,7 @@ const ChannelPage = () => {
   return (
     <Suspense fallback={<Loader />}>
       <div className="bg-white dark:bg-[#313338] flex flex-col h-full">
+        <div className="h-14 xs:hidden"></div>
         <ChatHeader name={channel?.name} imageUrl={user.imageUrl} type="channel" />
         {channel?.type === ChannelType.TEXT && (
           <>

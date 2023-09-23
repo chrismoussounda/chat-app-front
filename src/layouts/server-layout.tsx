@@ -13,7 +13,7 @@ const ServerLayout = () => {
   const { serverId = '' } = useParams();
   const navigate = useNavigate();
   const { server, isLoading } = useServer(serverId);
-  const alternativeServer = servers.find((server) => server.id !== serverId);
+  const alternativeServer = servers?.find((server) => server.id !== serverId);
   const generalChannel = alternativeServer?.channels?.find((channel) => channel.name === 'general');
 
   useEffect(() => {

@@ -1,7 +1,5 @@
 import { type ClassValue, clsx } from 'clsx';
-import { ref, uploadBytes, getDownloadURL, deleteObject, getBlob } from 'firebase/storage';
 import { twMerge } from 'tailwind-merge';
-import { storage } from './firebase';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
 import { createCanvas, Canvas } from 'canvas';
 import { Any } from '@/types';
@@ -10,36 +8,6 @@ GlobalWorkerOptions.workerSrc = '/node_modules/pdfjs-dist/build/pdf.worker.js';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
-}
-
-export async function uploadFile(file?: File) {
-  if (!file) throw new Error('Invalid image');
-  const location = file.type.includes('pdf') ? 'pdfs/' : 'images/' + getRandomNumber() + file.name;
-  const imagesRef = ref(storage, location);
-  await uploadBytes(imagesRef, file);
-  return { imageUrl: await getDownloadURL(imagesRef), location };
-}
-
-export async function deleteFile(location: string) {
-  try {
-    const fileRef = ref(storage, location);
-    await deleteObject(fileRef);
-  } catch (error: unknown) {
-    console.log(error);
-  }
-}
-export async function downloadFile(location: string) {
-  try {
-    const fileRef = ref(storage, location);
-    const data = await getBlob(fileRef);
-    return new File([data], 'image', { type: 'image/jpg' });
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-function getRandomNumber() {
-  return Math.floor(Math.random() * (999 - 100 + 1)) + 100;
 }
 
 export const getSessionData = (key: string) => {

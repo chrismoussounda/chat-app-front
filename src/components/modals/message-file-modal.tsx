@@ -13,9 +13,10 @@ import { Form, FormItem, FormControl, FormField, FormMessage } from '@/component
 import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/file-upload';
 import { useModal } from '@/hooks/use-modal-store';
-import { deleteFile, processPdf, uploadFile } from '@/lib/utils';
+import { processPdf } from '@/lib/utils';
 import { useParams } from 'react-router-dom';
 import { createDirectMessage, createMessage } from '@/services/message';
+import { uploadFile } from '@/services/file-upload';
 
 const formSchema = z.object({
   file: z.instanceof(File).refine((file) => file.size > 0, {
@@ -37,32 +38,31 @@ const MessageFileModal = () => {
   });
   const getPdfImage = async (file: File) => {
     const { imageFile } = await processPdf(file);
-    const { imageUrl, location } = await uploadFile(imageFile);
-    return { url: imageUrl, imageLocation: location };
+    return await uploadFile(imageFile);
   };
 
   const isLoading = form.formState.isSubmitting;
   const onSubmit = async ({ file }: z.infer<typeof formSchema>) => {
     const isPdf = file.type.includes('pdf');
-    let ref = '';
-    let contentUrl = '';
-    let contentRef = '';
+    let pdfPreview = '';
+    let fileUrl = '';
     try {
-      if (!memberId && !channelId) return;
-      const { imageUrl, location } = await uploadFile(file);
       if (isPdf) {
-        const { url, imageLocation } = await getPdfImage(file);
-        contentRef = imageLocation;
-        contentUrl = url;
+        pdfPreview = await getPdfImage(file);
       }
-      ref = location;
+      fileUrl = await uploadFile(file);
       if (channelId)
-        await createMessage({ content: imageUrl, fileUrl: imageUrl, serverId, channelId });
+        await createMessage({
+          content: isPdf ? pdfPreview : file.name,
+          fileUrl: fileUrl,
+          serverId,
+          channelId,
+        });
       if (memberId) {
         await createDirectMessage({
           conversationId,
-          content: isPdf ? contentUrl : file.name,
-          fileUrl: imageUrl,
+          content: isPdf ? pdfPreview : file.name,
+          fileUrl: fileUrl,
           memberId,
         });
       }
@@ -70,8 +70,6 @@ const MessageFileModal = () => {
       handleClose();
     } catch (error) {
       console.log(error);
-      if (ref) deleteFile(ref);
-      if (contentRef) deleteFile(contentRef);
     }
   };
 
